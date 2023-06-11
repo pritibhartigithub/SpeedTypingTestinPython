@@ -1,0 +1,90 @@
+import tkinter as tk
+import random
+import time
+
+def start_test():
+    global started, text_index, start_time
+    started = True
+    text_index = 0
+    start_time = time.time()
+    entry.config(state='normal')
+    entry.delete('1.0', tk.END)
+    entry.focus()
+
+def end_test():
+    global started
+    started = False
+    elapsed_time = time.time() - start_time
+    text = entry.get('1.0', tk.END)
+    words_typed = len(text.split())
+    accuracy = calculate_accuracy(text, original_text)
+    wpm = calculate_wpm(words_typed, elapsed_time)
+    result_text = f"Time: {elapsed_time:.2f}s\nWords typed: {words_typed}\nAccuracy: {accuracy:.2f}%\nWPM: {wpm:.2f}"
+    result.config(text=result_text)
+    entry.config(state='disabled')
+
+def calculate_accuracy(input_text, original_text):
+    original_words = original_text.split()
+    input_words = input_text.split()
+    correct_words = 0
+    for i in range(min(len(original_words), len(input_words))):
+        if original_words[i] == input_words[i]:
+            correct_words += 1
+    accuracy = (correct_words / len(original_words)) * 100
+    return accuracy
+
+def calculate_wpm(words_typed, elapsed_time):
+    minutes = elapsed_time / 60
+    wpm = words_typed / minutes
+    return wpm
+
+def generate_text():
+    global original_text
+    original_text = random.choice(texts)
+    text.config(text=original_text)
+
+# Create the main window
+window = tk.Tk()
+window.title("Speed Typing Test")
+
+# Create a label for the text
+text = tk.Label(window, text="", font=('Arial', 14), wraplength=400)
+text.pack(pady=10)
+
+# Create an Entry widget for typing
+entry = tk.Text(window, width=50, height=10, font=('Arial', 12), state='disabled')
+entry.pack(pady=10)
+
+# Create a Start button
+start_button = tk.Button(window, text="Start", font=('Arial', 14), command=start_test)
+start_button.pack(pady=5)
+
+# Create an End button
+end_button = tk.Button(window, text="End", font=('Arial', 14), command=end_test)
+end_button.pack(pady=5)
+
+# Create a label for the result
+result = tk.Label(window, text="", font=('Arial', 14))
+result.pack(pady=10)
+
+# Load the texts for typing
+texts = [
+    "The quick brown fox jumps over the lazy dog.",
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+    "Python is a powerful and easy-to-learn programming language.",
+    "Programming is fun and rewarding.",
+    "Practice makes perfect.",
+    "Keep calm and code on."
+]
+
+# Initialize global variables
+started = False
+text_index = 0
+start_time = 0
+original_text = ""
+
+# Generate initial text
+generate_text()
+
+# Start the main event loop
+window.mainloop()
